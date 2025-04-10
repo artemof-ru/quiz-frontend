@@ -3,10 +3,8 @@ import { questions } from '../utils/Questions'
 
 
 
-export default function AdminQuestion ({ clientCurrentScreen, adminShowQuestion, changeAdminShowScreen, changeClientScreen, selectAnswer, percentage }) {
+export default function AdminQuestion ({ clientCurrentScreen, adminShowQuestion, changeAdminShowScreen, changeClientScreen, selectAnswer, currentUsers, countVoted, percentage }) {
 	const [question, setQuestion] = useState(questions[adminShowQuestion - 1])
-
-	let currentUsers = '';
 
 	useEffect(()=>{
 		setQuestion(questions[adminShowQuestion - 1])
@@ -41,7 +39,7 @@ export default function AdminQuestion ({ clientCurrentScreen, adminShowQuestion,
 			}
 
 			<div className="vote-active">Активных: <span>{currentUsers} чел.</span></div>
-			<div className="vote-current">Проголосовало: <span>55 чел.</span></div>
+			<div className="vote-current">Проголосовало: <span>{countVoted} чел.</span></div>
 
 			<button
 				className={clientCurrentScreen === adminShowQuestion ? 'q-select-btn active' : 'q-select-btn'}

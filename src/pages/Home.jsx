@@ -12,41 +12,39 @@ export default function Home({socket, userId}) {
 
 
 
-	// checkVoted
-
+// useEffect(()=>{
 	if(socket.current) {
 		socket.current.onmessage = async (event) => {
 			const message =  JSON.parse(event.data)
-			await message.screen && setCurrentScreen(message?.screen);
+			 console.log(`message => `,message)
 
-			// console.log(`message => `,message)
+			if (message.event === 'settings' || message.event === 'connection') {
+				message.screen && setCurrentScreen(message.screen);
+			}
 
 
 
-			// setShowQuestionResult(message.votingID ? message.votingID : false)
-			// setShowQuestionResult(false)
-			if (message.event == 'answer') {
-				if (message.answerID && message.id == userId) setShowQuestionResult(message.answerID)
+			if (message.event === 'answer') {
+				if (message.answerID && message.id === userId) setShowQuestionResult(message.answerID)
 				checkVoted(currentScreen);
 				checkResult(currentScreen)
 			}
-			if (message.event == 'checkvoteduser') {
+			if (message.event === 'checkvoteduser') {
 				 setShowQuestionResult(message.votingID ? message.votingID : false)
 			}
 			// console.log(`showQuestionResult => `,showQuestionResult)
 
-			if(message.event == 'checkresult') {
+			if(message.event === 'checkresult') {
 				// setQuizResults(message.results)
 				results.current = message.results ? message.results : null
 				setQuizResults(message.results)
-
+				 console.log(`quizResults => `,quizResults)
 			}
 
 		}
-		// checkResult()
 	}
 
-	// useEffect(()=>{
+
 
 	// }, [])
 
@@ -73,7 +71,7 @@ export default function Home({socket, userId}) {
 			questionID,
 			id: userId,
 		}
-		socket?.current?.send(JSON.stringify(message))
+		if(questionID !== 'start') socket?.current?.send(JSON.stringify(message))
 
 	}
 	function checkResult(questionID) {
@@ -89,7 +87,7 @@ export default function Home({socket, userId}) {
 		if(results.current) total = results.current.reduce((acc, n) => acc + n.count, 0)
 
 		if(results.current) results.current.forEach(res => {
-			if(res._id == id) {
+			if(res._id === id) {
 				count = res.count
 			}
 		})

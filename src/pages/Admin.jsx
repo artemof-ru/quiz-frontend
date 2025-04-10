@@ -9,38 +9,67 @@ export default function Admin({socket, userId}) {
 
 	const [clientCurrentScreen, setClientCurrentScreen] = useState('start')
 	const [currentUsers, setCurrentUsers] = useState(0)
-
-
+	const [countVoted, setCountVoted] = useState(0)
 	const [quizResults, setQuizResults] = useState({})
+
+	let [isAdmin, setIsAdmin] = useState(localStorage.getItem('admin') ? true :false);
 
 	let adminResults = useRef()
 
-	// results.current = message.results ? message.results : null
 
-	if(socket.current) socket.current.onmessage = async (event) => {
-		const message = JSON.parse(event.data)
-		if(message.screen) setClientCurrentScreen(message.screen)
+	// useEffect(() => {
+		// checkResult(adminShowQuestion)
+	// }, [adminShowQuestion, adminResults])
 
-		console.log(`message => `,message)
-		// if(message.clients) setCurrentUsers(message.clients)
+	// useEffect(()=>{
+		if(socket.current) socket.current.onmessage = async (event) => {
+			const message = JSON.parse(event.data)
+			 console.log(`message => `,message)
+			if(message.screen) setClientCurrentScreen(message.screen)
+			if(message.clients) setCurrentUsers(message.clients)
 
-		if (message.event == 'answer') {
-			// checkResult(adminShowQuestion)
+			console.log(`message => `,message)
+			// if(message.clients) setCurrentUsers(message.clients)
+
+			if (message.event === 'answer') {
+				if (message.screen === adminShowQuestion) {
+					checkResult(adminShowQuestion)
+					checkCountVoted(adminShowQuestion)
+					console.log('ОБНОООВА')
+				}
+			}
+			if(message.event === 'checkresult') {
+				// adminResults.current = message.results ? message.results : null
+
+			}
+			if(message.event === 'admincheckresult') {
+				adminResults.current = message.results ? message.results : null
+				setQuizResults(message.results)
+			}
+			if(message.event === 'countvoted') {
+				setCountVoted(message.countvoted)
+				 console.log(`countVoted => `,countVoted)
+			}
+			// if(!isNaN(adminShowQuestion))
+
+
 		}
-		if(message.event == 'checkresult') {
-			adminResults.current = message.results ? message.results : null
-			// setQuizResults(message.results)
-		}
-
-	}
-
-
+	// })
 	useEffect(() => {
-		// if (!isNaN(adminShowQuestion)) {checkResult(adminShowQuestion); /* console.log('checkResult', adminListOrQuestion) */}
-		checkResult(adminShowQuestion)
-		// console.log('checkResult', adminListOrQuestion)
-	}, [adminShowQuestion, adminResults])
+		 checkResult(adminShowQuestion)
+		 checkCountVoted(adminShowQuestion)
+	}, [adminShowQuestion])
 
+
+
+	function checkAdminForm(e) {
+		e.preventDefault();
+		if( e.target[0].value === 'admin' && e.target[1].value === 'd#(F*$DO' ) {
+			setIsAdmin(true)
+			 console.log(` ВОШЛИИИ ` )
+			localStorage.setItem('admin', true)
+		}
+	}
 
 
 	function changeClientScreen(num) {
@@ -58,11 +87,9 @@ export default function Admin({socket, userId}) {
 	function changeAdminShowScreen(value) {
 		setAdminListOrQuestion(value)
 		setAdminShowQuestion(value)
-
-		checkResult(value)
-		// if (!isNaN(value)) checkResult(value)
+		 console.log(`value => `,value)
+		// checkResult(value, true)
 	}
-
 
 	function selectAnswer(answerID, questionID) {
 		let message = {
@@ -74,36 +101,37 @@ export default function Admin({socket, userId}) {
 		}
 		socket?.current?.send(JSON.stringify(message))
 		checkResult(adminShowQuestion)
+		checkCountVoted(adminShowQuestion)
 	}
 
-	function checkResult(questionID) {
+	function checkResult(questionID, broadcast) {
 		let message = {
-			event: 'checkresult',
+			event: 'admincheckresult',
 			questionID,
 			admin: true,
-			adminScreen: adminShowQuestion
+			adminScreen: adminShowQuestion,
+			noBroadcast: broadcast
 		}
 		socket?.current?.send(JSON.stringify(message))
 	}
 
+	function checkCountVoted(questionID) {
+		let message = {
+			event: 'countvoted',
+			questionID,
+		}
+		if(questionID !== 'start') socket?.current?.send(JSON.stringify(message))
+	}
 
 
 	function percentage(id) {
 		let count = 0
 		let total = 0
 		if(adminResults.current) total = adminResults.current.reduce((acc, n) => acc + n.count, 0)
-
 		if(adminResults.current) adminResults.current.forEach(res => {
-			if(res._id == id) {
-				count = res.count
-			}
+			if(res._id === id) count = res.count
 		})
-
 		let percentage = count / total * 100
-		//   console.log(`total => `,total)
-		//    console.log(`count => `,count)
-		//  console.log(`adminResults.current => `,adminResults.current)
-		//  console.log(`percentage => `,percentage)
 		return Math.round(percentage) | 0
 	}
 
@@ -111,25 +139,38 @@ export default function Admin({socket, userId}) {
 
 	return (
 		<>
-			<div className="admin-page">
-				{adminListOrQuestion === 'start' ? (
-					<AdminQuestionsList
-						clientCurrentScreen={clientCurrentScreen}
-						changeAdminShowScreen={ changeAdminShowScreen }
-						changeClientScreen={changeClientScreen}
-						/>
-				) : (
-					<AdminQuestion
-						clientCurrentScreen={clientCurrentScreen}
-						adminShowQuestion={adminShowQuestion}
-						changeAdminShowScreen={ changeAdminShowScreen }
-						changeClientScreen={changeClientScreen}
-						selectAnswer={selectAnswer}
+			{!isAdmin ? (
+				<form onSubmit={(e) => checkAdminForm(e)}>
+					<input className="form__input" type="text" name="login" placeholder="Логин" />
+					<input className="form__input" type="password" name="password" placeholder="Пароль" />
+					<button className="form__btn">Войти</button>
+				</form>
+			) : (
 
-						percentage = {percentage}
-						/>
-				)}
-			</div>
+				<div className="admin-page">
+					{adminListOrQuestion === 'start' ? (
+						<AdminQuestionsList
+							clientCurrentScreen={clientCurrentScreen}
+							changeAdminShowScreen={ changeAdminShowScreen }
+							changeClientScreen={changeClientScreen}
+							/>
+					) : (
+						<AdminQuestion
+							clientCurrentScreen={clientCurrentScreen}
+							adminShowQuestion={adminShowQuestion}
+							changeAdminShowScreen={ changeAdminShowScreen }
+							changeClientScreen={changeClientScreen}
+							selectAnswer={selectAnswer}
+
+							currentUsers={currentUsers}
+							countVoted={countVoted}
+
+
+							percentage = {percentage}
+							/>
+					)}
+				</div>
+			)}
 		</>
 	)
 
