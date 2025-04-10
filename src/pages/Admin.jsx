@@ -30,11 +30,14 @@ export default function Admin({socket, userId}) {
 
 			// if(message.clients) setCurrentUsers(message.clients)
 
+			if (message.event === 'clearquestion') {
+				checkResult(adminShowQuestion)
+				checkCountVoted(adminShowQuestion)
+			}
 			if (message.event === 'answer') {
 				if (message.screen === adminShowQuestion) {
 					checkResult(adminShowQuestion)
 					checkCountVoted(adminShowQuestion)
-					console.log('ОБНОООВА')
 				}
 			}
 			if(message.event === 'checkresult') {
@@ -135,6 +138,15 @@ export default function Admin({socket, userId}) {
 		return Math.round(percentage) | 0
 	}
 
+	function clearAnswers(questionID) {
+		let message = {
+			event: 'clearquestion',
+			questionID,
+			admin: true
+		}
+		socket?.current?.send(JSON.stringify(message))
+	}
+
 
 
 	return (
@@ -167,6 +179,7 @@ export default function Admin({socket, userId}) {
 
 
 							percentage = {percentage}
+							clearAnswers={clearAnswers}
 							/>
 					)}
 				</div>

@@ -3,7 +3,7 @@ import { questions } from '../utils/Questions'
 
 
 
-export default function AdminQuestion ({ clientCurrentScreen, adminShowQuestion, changeAdminShowScreen, changeClientScreen, selectAnswer, currentUsers, countVoted, percentage }) {
+export default function AdminQuestion ({ clientCurrentScreen, adminShowQuestion, changeAdminShowScreen, changeClientScreen, selectAnswer, currentUsers, countVoted, percentage, clearAnswers }) {
 	const [question, setQuestion] = useState(questions[adminShowQuestion - 1])
 
 	useEffect(()=>{
@@ -51,6 +51,16 @@ export default function AdminQuestion ({ clientCurrentScreen, adminShowQuestion,
 				}}
 			> Активировать вопрос </button>
 			<button onClick={() => changeAdminShowScreen('start')} className='link-back'>К списку вопросов</button>
+
+
+			<button
+				className='delete-btn'
+				onClick={(e)=>{
+					clearAnswers(question.id)
+					// changeClientScreen(adminShowQuestion);
+					// e.target.classList.add('active')
+				}}
+			> Очистить </button>
 
 		</div>
 

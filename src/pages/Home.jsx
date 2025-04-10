@@ -22,7 +22,10 @@ export default function Home({socket, userId}) {
 				message.screen && setCurrentScreen(message.screen);
 			}
 
-
+			if (message.event === 'clearquestion') {
+				checkResult(currentScreen)
+				setShowQuestionResult(false)
+			}
 
 			if (message.event === 'answer') {
 				if (message.answerID && message.id === userId) setShowQuestionResult(message.answerID)
