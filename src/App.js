@@ -2,10 +2,6 @@ import React, {useRef, useState, useEffect} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Admin from './pages/Admin'
-import AdminQuizOne from './pages/q-1';
-import AdminQuizTwo from './pages/q-2';
-import AdminQuizThree from './pages/q-3';
-import AdminQuizFour from './pages/q-4';
 
 
 import './App.css'
