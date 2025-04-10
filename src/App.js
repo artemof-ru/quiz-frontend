@@ -45,6 +45,7 @@ function App() {
 
 
 	function connect () {
+		const URL = process.env.SERVER_URL
 		socket.current = new WebSocket('ws://localhost:5000')
 
 		// слушатель сработает в момент подключения
