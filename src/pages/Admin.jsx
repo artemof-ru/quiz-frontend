@@ -24,11 +24,10 @@ export default function Admin({socket, userId}) {
 	// useEffect(()=>{
 		if(socket.current) socket.current.onmessage = async (event) => {
 			const message = JSON.parse(event.data)
-			 console.log(`message => `,message)
+			//  console.log(`message => `,message)
 			if(message.screen) setClientCurrentScreen(message.screen)
 			if(message.clients) setCurrentUsers(message.clients)
 
-			console.log(`message => `,message)
 			// if(message.clients) setCurrentUsers(message.clients)
 
 			if (message.event === 'answer') {
@@ -60,13 +59,14 @@ export default function Admin({socket, userId}) {
 		 checkCountVoted(adminShowQuestion)
 	}, [adminShowQuestion])
 
-
+	useEffect(()=> {
+		document.title = "Администратор"
+	})
 
 	function checkAdminForm(e) {
 		e.preventDefault();
 		if( e.target[0].value === 'admin' && e.target[1].value === 'd#(F*$DO' ) {
 			setIsAdmin(true)
-			 console.log(` ВОШЛИИИ ` )
 			localStorage.setItem('admin', true)
 		}
 	}

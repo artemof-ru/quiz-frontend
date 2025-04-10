@@ -38,7 +38,7 @@ export default function AdminQuestion ({ clientCurrentScreen, adminShowQuestion,
 				)})
 			}
 
-			<div className="vote-active">Активных: <span>{currentUsers} чел.</span></div>
+			<div className="vote-active">Активных: <span>{currentUsers - 1} чел.</span></div>
 			<div className="vote-current">Проголосовало: <span>{countVoted} чел.</span></div>
 
 			<button

@@ -16,7 +16,7 @@ export default function Home({socket, userId}) {
 	if(socket.current) {
 		socket.current.onmessage = async (event) => {
 			const message =  JSON.parse(event.data)
-			 console.log(`message => `,message)
+			//  console.log(`message => `,message)
 
 			if (message.event === 'settings' || message.event === 'connection') {
 				message.screen && setCurrentScreen(message.screen);
@@ -32,13 +32,11 @@ export default function Home({socket, userId}) {
 			if (message.event === 'checkvoteduser') {
 				 setShowQuestionResult(message.votingID ? message.votingID : false)
 			}
-			// console.log(`showQuestionResult => `,showQuestionResult)
 
 			if(message.event === 'checkresult') {
 				// setQuizResults(message.results)
 				results.current = message.results ? message.results : null
 				setQuizResults(message.results)
-				 console.log(`quizResults => `,quizResults)
 			}
 
 		}
